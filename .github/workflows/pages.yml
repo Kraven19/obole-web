@@ -1,0 +1,41 @@
+# Publie Obole (version web) sur GitHub Pages.
+# Le moteur (index.wasm, 40 Mo) n'est pas dans ce dépôt : c'est le fichier
+# officiel de Godot 4.7.2 (modèle web sans threads), que GitHub télécharge
+# lui-même ici, pour ne pas l'envoyer depuis une connexion lente.
+name: Publier la version web
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Récupérer le moteur officiel de Godot
+        run: |
+          set -e
+          curl -fsSL -o modeles.tpz "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz"
+          unzip -q -j modeles.tpz templates/web_nothreads_release.zip
+          unzip -q -j web_nothreads_release.zip godot.wasm
+          mv godot.wasm index.wasm
+          echo "fc74679e3b97f7687894" && sha256sum index.wasm
+          rm -f modeles.tpz web_nothreads_release.zip
+          mkdir -p _site
+          cp -R index.* .nojekyll _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploiement
+        uses: actions/deploy-pages@v4
