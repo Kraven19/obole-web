@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1793782546|6791705';
+const CACHE_VERSION = '1793797224|5284289';
 /** @type {string} */
 const CACHE_PREFIX = 'Obole-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
